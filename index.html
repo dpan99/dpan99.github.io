@@ -1,1 +1,124 @@
-Hello World
+<html> 
+  
+<head> 
+  <title> Custom Game </title> 
+  <script src="https://simplycodingcourses.com/files/simply.js"></script> 
+  <script> 
+    function start() { 
+      sjs.open("target", 1000, 500); 
+  
+      var background = new sjs.Image("Images/background.png"); 
+      background.setSize(1000, 500); 
+  
+      //sound
+      var soundEffectDrop = new Audio('Music/drop.mp3');
+      var soundEffectBack = new Audio('Music/america.mp3');
+      var soundEffectExp = new Audio('Music/exp.mp3');
+      var soundEffectYell = new Audio('Music/yell.mp3');
+
+      soundEffectBack.loop = true;
+      soundEffectBack.play();
+
+      //player
+      var player = new sjs.Image("Images/ship.png"); 
+      player.setSize(120, 120); 
+      player.centerH().top(); 
+      player.friction = 0.15; 
+  
+      //movement 
+      sjs.keyDown(LEFT_KEY, function() { 
+        player.setImage("Images/ship.png") 
+        player.pushLeft(2) 
+      }); 
+  
+      sjs.keyDown(RIGHT_KEY, function() { 
+        player.setImage("Images/shipr.png") 
+        player.pushRight(2) 
+      }); 
+  
+      sjs.keyDown(UP_KEY, function() { 
+        player.pushUp(2) 
+      }); 
+  
+      sjs.keyDown(DOWN_KEY, function() { 
+        player.pushDown(2) 
+      }); 
+  
+      var hut = new sjs.Image("Images/hut.png"); 
+      hut.centerH().bottom(); 
+      hut.setSize(195,195); 
+      hut.offset(-100,0); 
+  
+      //enemy 
+      setInterval(function() { 
+        var boy = new 
+        sjs.Image("Images/boy.png"); 
+        boy.setSize(70, 100); 
+        boy.friction = 0; 
+        boy.type = "enemy"; 
+        boy.setGravity(3); 
+        boy.bottom().centerH(); 
+        boy.noBounds = true; 
+  
+        var direction = Math.round(1 + Math.random() * 10); 
+        if (Math.random() > 0.5) { 
+          boy.pushRight(7); 
+        } else { 
+          boy.pushLeft(7); 
+        } 
+       }, 1000); 
+  
+       sjs.onHit("enemy",["left_screen","right_screen"], function(x,y){ 
+         sjs.bounceOff(x,y); 
+       }); 
+       sjs.onHit("enemy",["bottom_screen","top_screen"], function(x,y){ 
+         sjs.stoppedBy(x,y); 
+       }); 
+  
+      //bombs
+      window.addEventListener("keyup", function(e){
+      if(e.keyCode == SPACE_KEY){
+      var bomb = new sjs.Image("Images/nuke.png");   
+      bomb.type = "bomb"   
+      bomb.setSize(90, 90);     
+      bomb.setGravity(3);
+      bomb.moveTo(player.x, player.y);
+
+      } //end if statement
+    }); //end EventListener function 
+
+
+      var score = 120;
+      var score_txt = new sjs.Text("Population: 120", 21, "orange"); 
+      
+
+      sjs.onHit("bomb","enemy",function(x,y){
+      soundEffectExp.play();
+      setTimeout(function(){
+      soundEffectYell.play()
+      }, 100);
+      x.destroy();
+      y.destroy();
+       score = score - 1;
+      score_txt.setText("Population: "+score);
+      if(score <= 0){ 
+      window.location = "win.html";
+      }
+    }); 
+
+      sjs.onHit("bomb","bottom_screen",function(x,y){
+    x.destroy();
+    soundEffectExp.play();
+}); 
+      
+    } //end start 
+  </script> 
+</head> 
+  
+<body onload="start()"> 
+  <h1> WWII Simulator </h1> 
+  
+  <div id="target" style="margin:auto;background:grey;"></div> 
+</body> 
+  
+</html> 
